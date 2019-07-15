@@ -32,11 +32,15 @@ trait EachFileClassImplementsTrait
         string $interface,
         callable $callback
     ) {
-        $iterator = new RecursiveDirectoryRegexIterator($dir, $regEx);
-        foreach ($iterator as $file) {
-            $class = $namespace . '\\' . substr(basename($file), 0, -4);
-            $implements = class_implements($class);
-            empty($implements[$interface]) or $callback($class);
+        if (is_dir($dir)) {
+            $iterator = new RecursiveDirectoryRegexIterator($dir, $regEx);
+            foreach ($iterator as $file) {
+                $class = $namespace . '\\' . substr(basename($file), 0, -4);
+                if (class_exists($class)) {
+                    $implements = class_implements($class);
+                    empty($implements[$interface]) or $callback($class);
+                }
+            }
         }
     }
 }
